@@ -1,0 +1,36 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Leitor {
+  id          String   @id @default(uuid())
+  nome        String
+  vida        Int      @default(100)
+  vidaMaxima  Int      @default(100)
+  experiencia Int      @default(0)
+  criadoEm    DateTime @default(now())
+
+  estante     Livro[]
+}
+
+model Livro {
+  id           String   @id @default(uuid())
+  googleId     String?
+  titulo       String
+  autor        String
+  totalPaginas Int
+  hpAtual      Int
+  paginasLidas Int      @default(0)
+  status       String   @default("QUERO_LER") // QUERO_LER, LENDO, LIDO, ABANDONADO
+  isBoss       Boolean  @default(false)
+  genero       String?
+  capaUrl      String?
+
+  leitorId     String
+  leitor       Leitor   @relation(fields: [leitorId], references: [id], onDelete: Cascade)
+}

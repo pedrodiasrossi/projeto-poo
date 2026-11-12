@@ -1,0 +1,54 @@
+# ==============================================================================
+# BOOKQUEST (RPG LITERÁRIO) - .gitignore
+# ==============================================================================
+
+# --- BANCO DE DADOS & PRISMA ---
+# Arquivos de banco SQLite locais (não devem subir pois contêm dados de teste)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+prisma/*.db
+prisma/*.db-journal
+
+# Cliente gerado pelo Prisma
+node_modules/.prisma
+prisma/generated/
+
+# --- DEPENDÊNCIAS & RUNTIME ---
+# Módulos Node/Deno locais caso sejam instalados
+node_modules/
+.deno/
+deno.lock
+
+# --- VARIÁVEIS DE AMBIENTE & SEGREDOS ---
+# Arquivos com chaves de API, senhas e configurações sensíveis locais
+.env
+.env.local
+.env.*.local
+*.env
+
+# --- ARQUIVOS DE LOGS E DEBUGS ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- SISTEMA OPERACIONAL & EDITORES (Lixo de SO e IDEs) ---
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# --- BUILD E ARQUIVOS TEMPORÁRIOS ---
+dist/
+build/
+coverage/
+.temp/
+tmp/
