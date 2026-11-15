@@ -43,7 +43,7 @@ export default function App() {
   const [showNameModal, setShowNameModal] = useState(false);
 
   const [events, setEvents] = useState([
-    { type: "system", text: "Bem-vindo ao BookQuest! Conecte-se e derrote livros lendo páginas reais." }
+    { type: "system", text: "Bem-vindo ao ReadingPG! Conecte-se e derrote livros lendo páginas reais." }
   ]);
 
   const log = (type, text) => {
@@ -221,7 +221,7 @@ export default function App() {
             <BookOpen size={22} />
           </div>
           <div>
-            <strong>BOOKQUEST</strong>
+            <strong>READINGPG</strong>
             <span>RPG LITERÁRIO</span>
           </div>
         </div>
@@ -260,7 +260,7 @@ export default function App() {
 
         <div className="sidebar-foot">
           <span className="status-light" />
-          {error ? "Desconectado do Backend" : "BookQuest Conectado"}
+          {error ? "Desconectado do Backend" : "ReadingPG Conectado"}
         </div>
       </aside>
 
@@ -271,7 +271,7 @@ export default function App() {
           <div>
             <div className="eyebrow">RPG LITERÁRIO • SISTEMA POO</div>
             <h1>
-              BookQuest Arena <span>✦</span>
+              ReadingPG Arena <span>✦</span>
             </h1>
           </div>
           <div className="top-actions">
@@ -344,7 +344,7 @@ export default function App() {
               </div>
 
               <div className="eyebrow" style={{ color: "#a78bfa" }}>
-                BEM-VINDO AO BOOKQUEST
+                BEM-VINDO AO READINGPG
               </div>
               <h2 style={{ font: "700 24px 'Space Grotesk'", margin: "8px 0 10px" }}>
                 Crie seu Herói Leitor
@@ -833,7 +833,7 @@ export default function App() {
 
         <footer className="footer">
           <span>
-            BOOKQUEST <b>•</b> RPG LITERÁRIO
+            READINGPG <b>•</b> RPG LITERÁRIO
           </span>
           <span>Aventura focada em POO</span>
           <button onClick={carregarDados}>

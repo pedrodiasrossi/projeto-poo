@@ -1,4 +1,4 @@
-// Backend REST do RPG Literário (BookQuest)
+// Backend REST do RPG Literário (ReadingPG)
 // Rodar com: deno run -A src/servidor.ts (porta 3000)
 
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
@@ -388,7 +388,7 @@ const servidor = createServer(async (req: IncomingMessage, res: ServerResponse) 
 servidor.listen(PORT, () => {
   console.log(`
 ======================================================
-  ⚔️  BOOKQUEST (RPG LITERÁRIO) - BACKEND REST INICIADO
+  ⚔️  READINGPG (RPG LITERÁRIO) - BACKEND REST INICIADO
   📡  Rodando em: http://localhost:${PORT}
   🦕  Deno Runtime
 ======================================================

@@ -110,7 +110,7 @@ export class GoogleBooksService {
       const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
         termo
       )}&maxResults=${limite}`;
-      const resposta = await fetch(url, { headers: { "User-Agent": "BookQuest/1.0" } });
+      const resposta = await fetch(url, { headers: { "User-Agent": "ReadingPG/1.0" } });
 
       if (resposta.ok) {
         const dados = await resposta.json();

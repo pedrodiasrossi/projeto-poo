@@ -1,4 +1,4 @@
-# 📚 BookQuest: RPG Literário (R-PG)
+# 📚 ReadingPG: RPG Literário (R-PG)
 
 > Transformando o hábito diário de leitura em uma aventura interativa de RPG! Cada livro se torna um **Chefe (Boss)** onde a **vida total (HP) é o número de páginas** e **ler páginas reais desfere golpes** contra o monstro, gerando experiência (XP), progressão de níveis e moedas para a Loja de Itens.
 
@@ -6,7 +6,7 @@
 
 ## 🎯 Visão Geral do Projeto
 
-O **BookQuest** é uma aplicação completa (Backend REST em Deno + Frontend Reativo em React/Vite) desenvolvida sob os conceitos fundamentais de **Programação Orientada a Objetos (POO)**. Inspirado em redes sociais de leitura como o *Skoob*, o sistema transforma a estante pessoal do usuário em uma arena de batalha.
+O **ReadingPG** é uma aplicação completa (Backend REST em Deno + Frontend Reativo em React/Vite) desenvolvida sob os conceitos fundamentais de **Programação Orientada a Objetos (POO)**. Inspirado em redes sociais de leitura como o *Skoob*, o sistema transforma a estante pessoal do usuário em uma arena de batalha.
 
 ### 🌟 Principais Recursos
 

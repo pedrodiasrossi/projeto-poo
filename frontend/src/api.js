@@ -1,4 +1,4 @@
-// Camada de comunicação com a API REST do BookQuest
+// Camada de comunicação com a API REST do ReadingPG
 async function request(path, options = {}) {
   const response = await fetch(path, {
     ...options,
