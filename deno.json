@@ -1,11 +1,11 @@
 {
   "name": "bookquest-backend",
   "version": "1.0.0",
-  "exports": "./src/presentation/server.ts",
+  "exports": "./src/servidor.ts",
   "tasks": {
-    "dev": "deno run --allow-net --watch src/presentation/server.ts",
-    "start": "deno run --allow-net src/presentation/server.ts",
-    "check": "deno check src/presentation/server.ts"
+    "dev": "deno run --allow-net --watch src/servidor.ts",
+    "start": "deno run --allow-net src/servidor.ts",
+    "check": "deno check src/servidor.ts"
   },
   "compilerOptions": {
     "strict": true
