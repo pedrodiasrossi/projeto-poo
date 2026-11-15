@@ -11,6 +11,7 @@ import {
   LivroChefe,
   Batalha,
   Jogo,
+  ItemLoja,
 } from "./game.ts";
 import { GoogleBooksService } from "./googleBooks.ts";
 
@@ -18,10 +19,46 @@ const PORT = 3000;
 const googleBooksService = new GoogleBooksService();
 const batalhaService = new Batalha();
 
+// Catálogo da Loja de Itens por XP
+const ITENS_LOJA: ItemLoja[] = [
+  {
+    id: "marcador-madeira",
+    nome: "Marcador de Madeira Antiga",
+    descricao: "+1 de Dano por Página lida permanentemente",
+    custoXP: 50,
+    tipo: "DANO",
+    valor: 1,
+  },
+  {
+    id: "marcador-ouro",
+    nome: "Marcador Real Dourado",
+    descricao: "+3 de Dano por Página lida permanentemente",
+    custoXP: 150,
+    tipo: "DANO",
+    valor: 3,
+  },
+  {
+    id: "cafe-elfico",
+    nome: "Café Élfico Aromático",
+    descricao: "Restaura instantaneamente +30 de Vida/Energia do Leitor",
+    custoXP: 40,
+    tipo: "CURA",
+    valor: 30,
+  },
+  {
+    id: "grimorio-foco",
+    nome: "Tomo da Mente Blindada",
+    descricao: "Aumenta a Vida Máxima do Leitor em +50 HP",
+    custoXP: 120,
+    tipo: "MAX_VIDA",
+    valor: 50,
+  },
+];
+
 // Sessão em memória do Jogo para desenvolvimento imediato
-// (Assim que você implementar o PrismaJogoRepository, pode plugar aqui)
-let leitorAtual = new Leitor("player-1", "Aventureiro Leitor");
-let jogoAtual = new Jogo(leitorAtual);
+// Inicia como null se nenhum jogador foi criado ainda
+let leitorAtual: Leitor | null = null;
+let jogoAtual: Jogo | null = null;
 
 // Classes de erro para controle de respostas HTTP
 export class NaoEncontradoError extends Error {}
@@ -49,8 +86,12 @@ async function rotear(
   // 1. ROTAS DO USUÁRIO / LEITOR: /api/usuario
   // --------------------------------------------------------------------------
   if (recurso === "usuario") {
-    // GET /api/usuario -> Retorna os dados do leitor ativo
+    // GET /api/usuario -> Retorna os dados do leitor ativo ou null se não cadastrado
     if (metodo === "GET" && !id) {
+      if (!leitorAtual) {
+        return [200, { leitor: null, precisaCadastro: true }];
+      }
+
       return [
         200,
         {
@@ -60,7 +101,10 @@ async function rotear(
           vidaMaxima: leitorAtual.getVidaMaxima(),
           experiencia: leitorAtual.getExperiencia(),
           nivel: leitorAtual.getNivel(),
+          danoPorPagina: leitorAtual.getDanoPorPagina(),
+          inventario: leitorAtual.getInventario(),
           estaVivo: leitorAtual.estaVivo(),
+          precisaCadastro: false,
         },
       ];
     }
@@ -83,7 +127,13 @@ async function rotear(
             id: leitorAtual.id,
             nome: leitorAtual.nome,
             vida: leitorAtual.getVida(),
+            vidaMaxima: leitorAtual.getVidaMaxima(),
             nivel: leitorAtual.getNivel(),
+            experiencia: leitorAtual.getExperiencia(),
+            danoPorPagina: leitorAtual.getDanoPorPagina(),
+            inventario: leitorAtual.getInventario(),
+            estaVivo: leitorAtual.estaVivo(),
+            precisaCadastro: false,
           },
         },
       ];
@@ -109,6 +159,10 @@ async function rotear(
   // 3. ESTANTE / BIBLIOTECA PESSOAL: /api/estante
   // --------------------------------------------------------------------------
   if (recurso === "estante") {
+    if (!jogoAtual || !leitorAtual) {
+      return [200, { leitor: null, estante: [] }];
+    }
+
     // GET /api/estante -> Lista todos os livros na estante do jogador
     if (metodo === "GET" && !id) {
       const livros = jogoAtual.listarLivros().map((livro) => ({
@@ -228,6 +282,54 @@ async function rotear(
       if (!removido) throw new NaoEncontradoError(`Livro com ID ${id} não encontrado.`);
 
       return [200, { mensagem: `Livro ${id} removido da estante.` }];
+    }
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. LOJA DE ITENS COM XP: /api/loja
+  // --------------------------------------------------------------------------
+  if (recurso === "loja") {
+    // GET /api/loja -> Retorna os itens disponíveis na loja e o XP do usuário
+    if (metodo === "GET" && !id) {
+      return [
+        200,
+        {
+          saldoXP: leitorAtual ? leitorAtual.getExperiencia() : 0,
+          itens: ITENS_LOJA,
+          inventario: leitorAtual ? leitorAtual.getInventario() : [],
+        },
+      ];
+    }
+
+    // POST /api/loja/comprar -> Compra um item usando XP do leitor
+    if (metodo === "POST" && id === "comprar") {
+      if (!leitorAtual) {
+        throw new RegraNegocioError("Cadastre um herói primeiro antes de comprar itens.");
+      }
+
+      const itemId = String(body?.itemId ?? "").trim();
+      const item = ITENS_LOJA.find((i) => i.id === itemId);
+
+      if (!item) {
+        throw new NaoEncontradoError(`Item com ID '${itemId}' não encontrado no catálogo.`);
+      }
+
+      leitorAtual.comprarItem(item);
+
+      return [
+        200,
+        {
+          mensagem: `Você comprou "${item.nome}" com sucesso!`,
+          item,
+          leitor: {
+            experiencia: leitorAtual.getExperiencia(),
+            vida: leitorAtual.getVida(),
+            vidaMaxima: leitorAtual.getVidaMaxima(),
+            danoPorPagina: leitorAtual.getDanoPorPagina(),
+            inventario: leitorAtual.getInventario(),
+          },
+        },
+      ];
     }
   }
 

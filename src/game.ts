@@ -73,8 +73,18 @@ export abstract class EntidadeCombate {
   }
 }
 
+export interface ItemLoja {
+  id: string;
+  nome: string;
+  descricao: string;
+  custoXP: number;
+  tipo: "DANO" | "CURA" | "MAX_VIDA";
+  valor: number;
+}
+
 export class Leitor extends EntidadeCombate {
   private exp: number = 0;
+  private inventario: ItemLoja[] = [];
 
   constructor(
     public readonly id: string,
@@ -97,6 +107,14 @@ export class Leitor extends EntidadeCombate {
     return this.exp;
   }
 
+  public getDanoPorPagina(): number {
+    return this.danoPorPagina;
+  }
+
+  public getInventario(): ItemLoja[] {
+    return [...this.inventario];
+  }
+
   public ganharExperiencia(quantidade: number): void {
     if (quantidade > 0) {
       this.exp += quantidade;
@@ -105,6 +123,24 @@ export class Leitor extends EntidadeCombate {
 
   public calcularDano(paginas: number): number {
     return paginas * this.danoPorPagina;
+  }
+
+  public comprarItem(item: ItemLoja): void {
+    if (this.exp < item.custoXP) {
+      throw new Error(`XP insuficiente! Você possui ${this.exp} XP e o item custa ${item.custoXP} XP.`);
+    }
+
+    this.exp -= item.custoXP;
+    this.inventario.push(item);
+
+    if (item.tipo === "DANO") {
+      this.danoPorPagina += item.valor;
+    } else if (item.tipo === "CURA") {
+      this.curar(item.valor);
+    } else if (item.tipo === "MAX_VIDA") {
+      this.vidaMaxima += item.valor;
+      this.vida += item.valor;
+    }
   }
 
   public restaurarEstado(exp: number, vida?: number): void {
