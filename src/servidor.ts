@@ -5,14 +5,12 @@ import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import { Buffer } from "node:buffer";
 import { URL } from "node:url";
 
-import {
-  Leitor,
-  InimigoLivro,
-  LivroChefe,
-  Batalha,
-  Jogo,
-  ItemLoja,
-} from "./models";
+import { Leitor } from "./models/leitor.ts";
+import { InimigoLivro, LivroChefe } from "./models/livroModel.ts";
+import { Batalha } from "./models/batalha.ts";
+import { Jogo } from "./models/jogo.ts";
+import { ItemLoja } from "./models/interfaces.ts";
+
 import { GoogleBooksService } from "./googleBooks.ts";
 
 const PORT = 3000;
