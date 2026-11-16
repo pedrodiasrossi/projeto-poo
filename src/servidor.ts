@@ -12,7 +12,7 @@ import {
   Batalha,
   Jogo,
   ItemLoja,
-} from "./game.ts";
+} from "./models";
 import { GoogleBooksService } from "./googleBooks.ts";
 
 const PORT = 3000;

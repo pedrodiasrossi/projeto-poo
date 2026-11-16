@@ -1,5 +1,5 @@
-import { Leitor } from "./leitor";
-import { InimigoLivro } from "./livroModel";
+import { Leitor } from "./leitor.ts";
+import { InimigoLivro } from "./livroModel.ts";
 
 export type StatusLeitura = "QUERO_LER" | "LENDO" | "LIDO" | "ABANDONADO";
 export type statusLeitura = StatusLeitura;

@@ -1,5 +1,5 @@
-import { EntidadeCombate } from "./entidadeCombate";
-import { ItemLoja } from "./interfaces";
+import { EntidadeCombate } from "./entidadeCombate.ts";
+import { ItemLoja } from "./interfaces.ts";
 
 export class Leitor extends EntidadeCombate {
   private exp: number = 0;

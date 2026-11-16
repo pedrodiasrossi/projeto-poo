@@ -1,5 +1,5 @@
-import { EntidadeCombate } from "./entidadeCombate";
-import { StatusLeitura } from "./interfaces";
+import { EntidadeCombate } from "./entidadeCombate.ts";
+import { StatusLeitura } from "./interfaces.ts";
 
 export class InimigoLivro extends EntidadeCombate {
   private paginasLidas: number = 0;

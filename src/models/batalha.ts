@@ -1,6 +1,6 @@
-import { Leitor } from "./leitor";
-import { InimigoLivro, LivroChefe } from "./livroModel";
-import { ResultadoAtaqueLeitura } from "./interfaces";
+import { Leitor } from "./leitor.ts";
+import { InimigoLivro, LivroChefe } from "./livroModel.ts";
+import { ResultadoAtaqueLeitura } from "./interfaces.ts";
 
 export class Batalha {
   public processarTurnoLeitura(

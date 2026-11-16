@@ -1,5 +1,5 @@
-import { InimigoLivro } from "./livroModel";
-import { Leitor } from "./leitor";
+import { InimigoLivro } from "./livroModel.ts";
+import { Leitor } from "./leitor.ts";
 
 export class Jogo {
   private readonly estante: Map<string, InimigoLivro> = new Map();
