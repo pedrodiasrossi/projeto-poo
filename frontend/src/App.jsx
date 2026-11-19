@@ -16,7 +16,9 @@ import {
   Flame,
   Award,
   ChevronRight,
-  BookMarked
+  BookMarked,
+  GraduationCap,
+  Crown
 } from "lucide-react";
 import { api } from "./api.js";
 
@@ -25,7 +27,7 @@ export default function App() {
   const [leitor, setLeitor] = useState(null);
   const [livros, setLivros] = useState([]);
   const [activeBookId, setActiveBookId] = useState("");
-  const [shopData, setShopData] = useState({ itens: [], saldoXP: 0, inventario: [] });
+  const [shopData, setShopData] = useState({ itens: [], saldoXP: 0, saldoSabedoria: 0, inventario: [] });
 
   // Busca no Google Books
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,7 +108,10 @@ export default function App() {
         `Você leu ${res.danoCausado} páginas e causou ${res.danoCausado} de dano em "${livroAtivo.titulo}"! (+${res.xpGanho} XP)`
       );
       if (res.livroDerrotado) {
-        log("success", `🏆 O LIVRO "${livroAtivo.titulo}" FOI DERROTADO / CONCLUÍDO! Bônus concedido!`);
+        log(
+          "success",
+          `🏆 O LIVRO "${livroAtivo.titulo}" FOI CONCLUÍDO! Você recebeu +${res.sabedoriaGanha || 1} Ponto(s) de Sabedoria!`
+        );
       }
     } catch (e) {
       setError(e.message);
@@ -288,15 +293,33 @@ export default function App() {
               <RefreshCw size={17} />
             </button>
             <div
-              className="avatar"
-              title="Clique para editar o nome do Herói"
-              style={{ cursor: "pointer" }}
+              style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
               onClick={() => {
                 setHeroNameInput(leitor?.nome || "");
                 setShowNameModal(true);
               }}
             >
-              {leitor?.nome?.slice(0, 1)?.toUpperCase() || "L"}
+              <div
+                className="avatar"
+                title="Clique para editar o nome do Herói"
+              >
+                {leitor?.nome?.slice(0, 1)?.toUpperCase() || "L"}
+              </div>
+              {leitor?.titulo && (
+                <span
+                  style={{
+                    fontSize: "11px",
+                    background: "#312e81",
+                    color: "#a5b4fc",
+                    padding: "2px 8px",
+                    borderRadius: "12px",
+                    border: "1px solid #4338ca",
+                    fontWeight: 600
+                  }}
+                >
+                  {leitor.titulo}
+                </span>
+              )}
             </div>
           </div>
         </header>
@@ -405,16 +428,18 @@ export default function App() {
             </div>
             <div className="stat-label">Herói Leitor</div>
             <div className="stat-value">Nível {leitor?.nivel || 1}</div>
-            <div className="stat-detail">{leitor?.nome || "Aventureiro Leitor"}</div>
+            <div className="stat-detail">
+              {leitor?.totalXpGanho || 0} XP Total • {leitor?.titulo || "Leitor Novato"}
+            </div>
           </div>
 
           <div className="stat-card">
             <div className="stat-icon blue">
               <Zap size={18} />
             </div>
-            <div className="stat-label">Experiência Acumulada</div>
+            <div className="stat-label">XP Disponível (Saldo)</div>
             <div className="stat-value">{leitor?.experiencia || 0} XP</div>
-            <div className="stat-detail">Disponível para gastar na loja</div>
+            <div className="stat-detail">Gaste na loja sem perder seu Nível</div>
           </div>
 
           <div className="stat-card">
@@ -437,11 +462,11 @@ export default function App() {
 
           <div className="stat-card">
             <div className="stat-icon gold">
-              <Flame size={18} />
+              <GraduationCap size={18} />
             </div>
-            <div className="stat-label">Poder de Ataque</div>
-            <div className="stat-value">{leitor?.danoPorPagina || 1} Dano/pág</div>
-            <div className="stat-detail">Aprimorável na Loja de XP</div>
+            <div className="stat-label">Pontos de Sabedoria</div>
+            <div className="stat-value">{leitor?.sabedoria || 0} ★</div>
+            <div className="stat-detail">Ganho ao derrotar livros inteiros</div>
           </div>
         </section>
 
@@ -711,65 +736,86 @@ export default function App() {
             <div className="panel">
               <div className="panel-heading">
                 <div>
-                  <div className="eyebrow">MERCADOR LITERÁRIO</div>
+                  <div className="eyebrow">MERCADOR LITERÁRIO & ACADEMIA DOS SÁBIOS</div>
                   <h3>Loja de Recompensas de Leitura</h3>
                 </div>
-                <div style={{ font: "700 16px 'Space Grotesk'", color: "#38bdf8" }}>
-                  Saldo: {leitor?.experiencia || 0} XP
+                <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+                  <div style={{ font: "700 15px 'Space Grotesk'", color: "#38bdf8" }}>
+                    Saldo: {leitor?.experiencia || 0} XP
+                  </div>
+                  <div style={{ font: "700 15px 'Space Grotesk'", color: "#facc15" }}>
+                    Sabedoria: {leitor?.sabedoria || 0} ★
+                  </div>
                 </div>
               </div>
               <p style={{ color: "#8f9cb5", fontSize: "12px", marginTop: "-6px", marginBottom: "20px" }}>
-                Gaste os pontos de experiência ganhos ao desferir leituras e derrotar livros para aprimorar seus poderes!
+                Gaste pontos de experiência para restaurar energia, expandir foco e acelerar aprendizados — ou use pontos de Sabedoria (conquistados ao concluir livros) para desbloquear Títulos honoríficos!
               </p>
 
               <div className="shop-grid">
                 {shopData.itens.map((item) => {
-                  const podeComprar = (leitor?.experiencia || 0) >= item.custoXP;
+                  const custoXP = item.custoXP || 0;
+                  const custoSab = item.custoSabedoria || 0;
+                  const temXP = (leitor?.experiencia || 0) >= custoXP;
+                  const temSab = (leitor?.sabedoria || 0) >= custoSab;
+                  const podeComprar = temXP && temSab;
 
-                  // Definir ou Alterar Nome do Herói
-  const handleSalvarHeroi = async (e) => {
-    e.preventDefault();
-    if (!heroNameInput.trim()) return setError("Por favor, digite um nome para seu herói.");
-    setBusy(true);
-    setError("");
-    try {
-      await api.criarUsuario(heroNameInput.trim());
-      await carregarDados();
-      setShowNameModal(false);
-      log("success", `Herói "${heroNameInput.trim()}" criado com sucesso! Prepare-se para a aventura.`);
-      setHeroNameInput("");
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
-  };
+                  const isTitulo = item.tipo === "TITULO";
+                  const jaPossuiTitulo = isTitulo && leitor?.titulo === item.valor;
 
-  return (
+                  return (
                     <div key={item.id} className="shop-card">
                       <div
                         className="shop-card-icon"
                         style={{
                           background:
-                            item.tipo === "DANO" ? "#a78bfa22" : item.tipo === "CURA" ? "#f472b622" : "#38bdf822",
+                            item.tipo === "TITULO"
+                              ? "#facc1522"
+                              : item.tipo === "BONUS_XP"
+                              ? "#a78bfa22"
+                              : item.tipo === "CURA"
+                              ? "#f472b622"
+                              : "#38bdf822",
                           color:
-                            item.tipo === "DANO" ? "#c4b5fd" : item.tipo === "CURA" ? "#f9a8d4" : "#7dd3fc"
+                            item.tipo === "TITULO"
+                              ? "#facc15"
+                              : item.tipo === "BONUS_XP"
+                              ? "#c4b5fd"
+                              : item.tipo === "CURA"
+                              ? "#f9a8d4"
+                              : "#7dd3fc"
                         }}
                       >
-                        {item.tipo === "DANO" ? <Swords size={22} /> : item.tipo === "CURA" ? <Heart size={22} /> : <Shield size={22} />}
+                        {item.tipo === "TITULO" ? (
+                          <Crown size={22} />
+                        ) : item.tipo === "BONUS_XP" ? (
+                          <Sparkles size={22} />
+                        ) : item.tipo === "CURA" ? (
+                          <Heart size={22} />
+                        ) : (
+                          <Shield size={22} />
+                        )}
                       </div>
                       <h4>{item.nome}</h4>
                       <p>{item.descricao}</p>
                       <div className="shop-card-foot">
                         <div className="shop-cost">
-                          <Zap size={16} /> {item.custoXP} XP
+                          {custoSab > 0 ? (
+                            <>
+                              <GraduationCap size={16} /> {custoSab} Sabedoria
+                            </>
+                          ) : (
+                            <>
+                              <Zap size={16} /> {custoXP} XP
+                            </>
+                          )}
                         </div>
                         <button
                           className="buy-btn"
-                          disabled={!podeComprar || busy}
+                          disabled={!podeComprar || busy || jaPossuiTitulo}
                           onClick={() => handleComprarItem(item)}
                         >
-                          Comprar
+                          {jaPossuiTitulo ? "Ativo" : isTitulo ? "Desbloquear" : "Comprar"}
                         </button>
                       </div>
                     </div>

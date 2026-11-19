@@ -9,6 +9,7 @@ export interface ResultadoAtaqueLeitura {
   vidaRestanteLivro: number;
   livroDerrotado: boolean;
   xpGanho: number;
+  sabedoriaGanha?: number;
   nivelAtual: number;
 }
 export type resultadoAtaqueLeitura = ResultadoAtaqueLeitura;
@@ -19,6 +20,9 @@ export interface LeitorData {
   vida: number;
   vidaMaxima: number;
   exp: number;
+  totalXpGanho?: number;
+  sabedoria?: number;
+  titulo?: string;
 }
 export type leitorData = LeitorData;
 
@@ -51,6 +55,7 @@ export interface ItemLoja {
   nome: string;
   descricao: string;
   custoXP: number;
-  tipo: "DANO" | "CURA" | "MAX_VIDA";
-  valor: number;
+  custoSabedoria?: number;
+  tipo: "CURA" | "MAX_VIDA" | "BONUS_XP" | "TITULO";
+  valor: number | string;
 }

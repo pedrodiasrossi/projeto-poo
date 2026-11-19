@@ -17,39 +17,75 @@ const PORT = 3000;
 const googleBooksService = new GoogleBooksService();
 const batalhaService = new Batalha();
 
-// Catálogo da Loja de Itens por XP
+// Catálogo da Loja de Itens e Recompensas
 const ITENS_LOJA: ItemLoja[] = [
-  {
-    id: "marcador-madeira",
-    nome: "Marcador de Madeira Antiga",
-    descricao: "+1 de Dano por Página lida permanentemente",
-    custoXP: 50,
-    tipo: "DANO",
-    valor: 1,
-  },
-  {
-    id: "marcador-ouro",
-    nome: "Marcador Real Dourado",
-    descricao: "+3 de Dano por Página lida permanentemente",
-    custoXP: 150,
-    tipo: "DANO",
-    valor: 3,
-  },
   {
     id: "cafe-elfico",
     nome: "Café Élfico Aromático",
-    descricao: "Restaura instantaneamente +30 de Vida/Energia do Leitor",
+    descricao: "Restaura instantaneamente +35 de Vida/Energia do Leitor",
     custoXP: 40,
     tipo: "CURA",
-    valor: 30,
+    valor: 35,
+  },
+  {
+    id: "cha-camomila",
+    nome: "Infusão de Foco e Serenidade",
+    descricao: "Alivia o cansaço mental e recupera +20 de Vida/Energia",
+    custoXP: 25,
+    tipo: "CURA",
+    valor: 20,
   },
   {
     id: "grimorio-foco",
     nome: "Tomo da Mente Blindada",
-    descricao: "Aumenta a Vida Máxima do Leitor em +50 HP",
-    custoXP: 120,
+    descricao: "Expande a capacidade de concentração: +40 HP Máximo",
+    custoXP: 100,
     tipo: "MAX_VIDA",
-    valor: 50,
+    valor: 40,
+  },
+  {
+    id: "oculos-erudito",
+    nome: "Óculos do Erudito Ávido",
+    descricao: "Estudo aprofundado: concede +25% de XP bônus em todas as leituras",
+    custoXP: 120,
+    tipo: "BONUS_XP",
+    valor: 0.25,
+  },
+  {
+    id: "monoculo-arcano",
+    nome: "Monóculo Arcano de Análise",
+    descricao: "Compreensão suprema: concede +50% de XP bônus em todas as leituras",
+    custoXP: 220,
+    tipo: "BONUS_XP",
+    valor: 0.5,
+  },
+  // Títulos Honoríficos comprados com Pontos de Sabedoria (conquistados ao derrotar livros)
+  {
+    id: "titulo-rato-biblioteca",
+    nome: "Título: Rato de Biblioteca",
+    descricao: "Título de prestígio para leitores devotos. Requer derrotar ao menos 1 livro.",
+    custoXP: 0,
+    custoSabedoria: 1,
+    tipo: "TITULO",
+    valor: "Rato de Biblioteca",
+  },
+  {
+    id: "titulo-conquistador-tomos",
+    nome: "Título: Conquistador de Tomos",
+    descricao: "Condecoração dada a quem desafia obras densas. Requer 3 pontos de Sabedoria.",
+    custoXP: 0,
+    custoSabedoria: 3,
+    tipo: "TITULO",
+    valor: "Conquistador de Tomos",
+  },
+  {
+    id: "titulo-sabio-ancestral",
+    nome: "Título: Sábio das Letras Ancestrais",
+    descricao: "Título supremo para mestres da literatura. Requer 5 pontos de Sabedoria.",
+    custoXP: 0,
+    custoSabedoria: 5,
+    tipo: "TITULO",
+    valor: "Sábio das Letras Ancestrais",
   },
 ];
 
@@ -98,6 +134,10 @@ async function rotear(
           vida: leitorAtual.getVida(),
           vidaMaxima: leitorAtual.getVidaMaxima(),
           experiencia: leitorAtual.getExperiencia(),
+          totalXpGanho: leitorAtual.getTotalXpGanho(),
+          sabedoria: leitorAtual.getSabedoria(),
+          multiplicadorXP: leitorAtual.getMultiplicadorXP(),
+          titulo: leitorAtual.getTitulo(),
           nivel: leitorAtual.getNivel(),
           danoPorPagina: leitorAtual.getDanoPorPagina(),
           inventario: leitorAtual.getInventario(),
@@ -128,6 +168,10 @@ async function rotear(
             vidaMaxima: leitorAtual.getVidaMaxima(),
             nivel: leitorAtual.getNivel(),
             experiencia: leitorAtual.getExperiencia(),
+            totalXpGanho: leitorAtual.getTotalXpGanho(),
+            sabedoria: leitorAtual.getSabedoria(),
+            multiplicadorXP: leitorAtual.getMultiplicadorXP(),
+            titulo: leitorAtual.getTitulo(),
             danoPorPagina: leitorAtual.getDanoPorPagina(),
             inventario: leitorAtual.getInventario(),
             estaVivo: leitorAtual.estaVivo(),
@@ -287,12 +331,13 @@ async function rotear(
   // 4. LOJA DE ITENS COM XP: /api/loja
   // --------------------------------------------------------------------------
   if (recurso === "loja") {
-    // GET /api/loja -> Retorna os itens disponíveis na loja e o XP do usuário
+    // GET /api/loja -> Retorna os itens disponíveis na loja e os saldos do usuário
     if (metodo === "GET" && !id) {
       return [
         200,
         {
           saldoXP: leitorAtual ? leitorAtual.getExperiencia() : 0,
+          saldoSabedoria: leitorAtual ? leitorAtual.getSabedoria() : 0,
           itens: ITENS_LOJA,
           inventario: leitorAtual ? leitorAtual.getInventario() : [],
         },
@@ -321,6 +366,11 @@ async function rotear(
           item,
           leitor: {
             experiencia: leitorAtual.getExperiencia(),
+            totalXpGanho: leitorAtual.getTotalXpGanho(),
+            nivel: leitorAtual.getNivel(),
+            sabedoria: leitorAtual.getSabedoria(),
+            multiplicadorXP: leitorAtual.getMultiplicadorXP(),
+            titulo: leitorAtual.getTitulo(),
             vida: leitorAtual.getVida(),
             vidaMaxima: leitorAtual.getVidaMaxima(),
             danoPorPagina: leitorAtual.getDanoPorPagina(),
