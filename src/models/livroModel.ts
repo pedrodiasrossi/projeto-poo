@@ -68,6 +68,14 @@ export class InimigoLivro extends EntidadeCombate {
     this.vida = Math.min(this.vidaMaxima, Math.max(0, vida));
     this.status = status;
   }
+
+  public calcularXP(xpBase: number): number{
+    return xpBase;
+  }
+
+  public getSabedoriaRecompensa(): number{
+    return 1;
+  }
 }
 
 export class LivroChefe extends InimigoLivro {
@@ -84,7 +92,11 @@ export class LivroChefe extends InimigoLivro {
     super(id, titulo, autor, totalPaginas, googleBooksId, capaUrl);
   }
 
-  public calcularBonusXP(xpBase: number): number {
+  public calcularXP(xpBase: number): number {
     return Math.round(xpBase * this.multiplicadorXP);
+  }
+
+  public getSabedoriaRecompensa(): number{
+    return 2;
   }
 }
