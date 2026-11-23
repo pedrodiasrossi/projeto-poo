@@ -25,6 +25,10 @@ export class Batalha {
       leitor.ganharSabedoria(sabedoriaGanha);
     }
 
+    if (!leitor.estaVivo){
+      throw new Error("O herói está exausto! Tome um Café Élfico ou descanse antes de continuar lendo.");
+    }
+
     // Aplica o cálculo polimórfico de XP do próprio InimigoLivro (LivroChefe aplica seu multiplicador)
     xpGanho = livro.calcularXP(xpGanho);
     leitor.ganharExperiencia(xpGanho);
