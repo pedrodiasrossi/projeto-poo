@@ -206,14 +206,24 @@ export default function App() {
   // Definir ou Alterar Nome do Herói
   const handleSalvarHeroi = async (e) => {
     e.preventDefault();
-    if (!heroNameInput.trim()) return setError("Por favor, digite um nome para seu herói.");
+    const novoNome = heroNameInput.trim();
+    if (!novoNome) return setError("Por favor, digite um nome para seu herói.");
     setBusy(true);
     setError("");
     try {
-      await api.criarUsuario(heroNameInput.trim());
-      await carregarDados();
-      setShowNameModal(false);
-      log("success", `Herói "${heroNameInput.trim()}" criado com sucesso! Prepare-se para a aventura.`);
+      if (leitor?.id) {
+        // Herói já existe: apenas atualiza o nome sem resetar estante ou status
+        await api.atualizarUsuario(novoNome);
+        await carregarDados();
+        setShowNameModal(false);
+        log("success", `Nome do herói alterado para "${novoNome}" com sucesso!`);
+      } else {
+        // Primeiro cadastro: cria o novo herói
+        await api.criarUsuario(novoNome);
+        await carregarDados();
+        setShowNameModal(false);
+        log("success", `Herói "${novoNome}" criado com sucesso! Prepare-se para a aventura.`);
+      }
       setHeroNameInput("");
     } catch (e) {
       setError(e.message);
@@ -372,14 +382,15 @@ export default function App() {
               </div>
 
               <div className="eyebrow" style={{ color: "#a78bfa" }}>
-                BEM-VINDO AO READINGPG
+                {leitor?.id ? "PERFIL DO HEROI" : "BEM-VINDO AO READINGPG"}
               </div>
               <h2 style={{ font: "700 24px 'Space Grotesk'", margin: "8px 0 10px" }}>
-                Crie seu Herói Leitor
+                {leitor?.id ? "Renomear Aventureiro" : "Crie seu Herói Leitor"}
               </h2>
               <p style={{ color: "#9aa7c2", fontSize: "12px", lineHeight: 1.6, margin: "0 0 22px" }}>
-                Para iniciar sua jornada e transformar suas leituras diárias em golpes de RPG,
-                escolha o nome do seu aventureiro:
+                {leitor?.id
+                  ? "Altere o nome do seu aventureiro. Seu nível, livros e inventário serão mantidos intactos!"
+                  : "Para iniciar sua jornada e transformar suas leituras diárias em golpes de RPG, escolha o nome do seu aventureiro:"}
               </p>
 
               <form onSubmit={handleSalvarHeroi}>
@@ -401,14 +412,27 @@ export default function App() {
                   }}
                   autoFocus
                 />
-                <button
-                  type="submit"
-                  className="primary-button"
-                  style={{ width: "100%", justifyContent: "center", padding: "13px" }}
-                  disabled={busy}
-                >
-                  <Sparkles size={16} /> Iniciar Aventura
-                </button>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  {leitor?.id && (
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      style={{ flex: 1, justifyContent: "center", padding: "13px" }}
+                      onClick={() => setShowNameModal(false)}
+                      disabled={busy}
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                  <button
+                    type="submit"
+                    className="primary-button"
+                    style={{ flex: 1, justifyContent: "center", padding: "13px" }}
+                    disabled={busy}
+                  >
+                    <Sparkles size={16} /> {leitor?.id ? "Salvar Nome" : "Iniciar Aventura"}
+                  </button>
+                </div>
               </form>
             </div>
           </div>

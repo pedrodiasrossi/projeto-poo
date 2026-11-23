@@ -17,6 +17,14 @@ export class Leitor extends EntidadeCombate {
     super(nome, vidaMaxima, vidaMaxima);
   }
 
+  public setNome(novoNome: string): void {
+    const nomeLimpo = novoNome.trim();
+    if (!nomeLimpo) {
+      throw new Error("O nome do leitor não pode ser vazio.");
+    }
+    this.nome = nomeLimpo;
+  }
+
   /**
    * O nível do leitor é calculado com base no total acumulado histórico de XP
    * ganho pelo personagem (cada 100 XP acumulados = +1 Nível).

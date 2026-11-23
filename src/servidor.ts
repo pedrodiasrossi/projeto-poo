@@ -166,6 +166,43 @@ async function rotear(
       ];
     }
 
+    // PUT /api/usuario -> Atualiza o nome do herói atual sem perder progresso
+    if (metodo === "PUT" && !id) {
+      if (!leitorAtual) {
+        throw new RegraNegocioError("Nenhum aventureiro ativo para atualizar.");
+      }
+      const novoNome = String(body?.nome ?? "").trim();
+      if (!novoNome) {
+        throw new RegraNegocioError("O novo nome não pode ser vazio.");
+      }
+
+      leitorAtual.setNome(novoNome);
+      await repository.salvarLeitor(leitorAtual);
+
+      return [
+        200,
+        {
+          mensagem: `Nome do herói alterado com sucesso para "${leitorAtual.nome}"!`,
+          leitor: {
+            id: leitorAtual.id,
+            nome: leitorAtual.nome,
+            vida: leitorAtual.getVida(),
+            vidaMaxima: leitorAtual.getVidaMaxima(),
+            nivel: leitorAtual.getNivel(),
+            experiencia: leitorAtual.getExperiencia(),
+            totalXpGanho: leitorAtual.getTotalXpGanho(),
+            sabedoria: leitorAtual.getSabedoria(),
+            multiplicadorXP: leitorAtual.getMultiplicadorXP(),
+            titulo: leitorAtual.getTitulo(),
+            danoPorPagina: leitorAtual.getDanoPorPagina(),
+            inventario: leitorAtual.getInventario(),
+            estaVivo: leitorAtual.estaVivo(),
+            precisaCadastro: false,
+          },
+        },
+      ];
+    }
+
     // POST /api/usuario -> Cria ou carrega o jogador pelo nome
     if (metodo === "POST" && !id) {
       const nome = String(body?.nome ?? "").trim();

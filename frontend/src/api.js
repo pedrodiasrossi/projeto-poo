@@ -26,6 +26,12 @@ const post = (path, body) =>
     ...(body === undefined ? {} : { body: JSON.stringify(body) })
   });
 
+const put = (path, body) =>
+  request(path, {
+    method: "PUT",
+    ...(body === undefined ? {} : { body: JSON.stringify(body) })
+  });
+
 const del = (path) =>
   request(path, {
     method: "DELETE"
@@ -35,6 +41,7 @@ export const api = {
   // Usuário / Leitor
   obterUsuario: () => request("/api/usuario"),
   criarUsuario: (nome) => post("/api/usuario", { nome }),
+  atualizarUsuario: (nome) => put("/api/usuario", { nome }),
 
   // Estante
   obterEstante: () => request("/api/estante"),

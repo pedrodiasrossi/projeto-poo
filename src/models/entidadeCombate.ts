@@ -1,6 +1,6 @@
 export abstract class EntidadeCombate {
   constructor(
-    public readonly nome: string,
+    public nome: string,
     protected vidaMaxima: number,
     protected vida: number
   ) {}
