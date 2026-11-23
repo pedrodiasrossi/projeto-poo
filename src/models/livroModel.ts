@@ -25,6 +25,10 @@ export class InimigoLivro extends EntidadeCombate {
       throw new Error("A quantidade de páginas lidas deve ser maior que zero.");
     }
 
+    if (paginas > this.vida) {
+      throw new Error("Número inválido de páginas");
+    }
+
     // O dano real não pode ultrapassar a vida (páginas restantes) do livro
     const danoReal = Math.min(paginas, this.vida);
 

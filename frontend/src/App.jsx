@@ -97,6 +97,11 @@ export default function App() {
     if (!livroAtivo) return setError("Selecione um livro na estante para ler.");
     const paginas = Number(pagesToRead);
     if (!paginas || paginas <= 0) return setError("Informe uma quantidade válida de páginas.");
+    if (paginas > livroAtivo.hpAtual) {
+      return setError(
+        `Número inválido de páginas: o livro possui apenas ${livroAtivo.hpAtual} página(s) restante(s).`
+      );
+    }
 
     setBusy(true);
     setError("");
@@ -526,17 +531,20 @@ export default function App() {
                     <input
                       type="number"
                       min="1"
-                      max={livroAtivo.hpAtual || 100}
+                      max={livroAtivo.hpAtual || 1}
                       value={pagesToRead}
                       onChange={(e) => setPagesToRead(e.target.value)}
                       placeholder="Páginas lidas"
                       disabled={livroAtivo.derrotado || busy}
                     />
                   </div>
+                  <small style={{ color: "#7987a5", fontSize: "11px", display: "block", marginBottom: "8px" }}>
+                    Máximo permitido: {livroAtivo.hpAtual} página(s) restante(s)
+                  </small>
                   <button
                     className="attack-btn"
                     onClick={handleAtacar}
-                    disabled={livroAtivo.derrotado || busy}
+                    disabled={livroAtivo.derrotado || busy || Number(pagesToRead) > livroAtivo.hpAtual}
                   >
                     <Swords size={16} /> Ler e Atacar
                   </button>

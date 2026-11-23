@@ -1,11 +1,14 @@
 {
-  "name": "readingpg-backend",
+  "name": "bookquest-backend",
   "version": "1.0.0",
   "exports": "./src/servidor.ts",
+  "nodeModulesDir": "auto",
   "tasks": {
-    "dev": "deno run --allow-net --watch src/servidor.ts",
-    "start": "deno run --allow-net src/servidor.ts",
-    "check": "deno check src/servidor.ts"
+    "dev": "deno run -A --watch src/servidor.ts",
+    "start": "deno run -A src/servidor.ts",
+    "prisma:push": "deno run -A npm:prisma@5.22.0 db push",
+    "prisma:generate": "deno run -A npm:prisma@5.22.0 generate",
+    "prisma:studio": "deno run -A npm:prisma@5.22.0 studio"
   },
   "compilerOptions": {
     "strict": true

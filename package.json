@@ -1,0 +1,9 @@
+{
+  "name": "bookquest-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0"
+  }
+}
