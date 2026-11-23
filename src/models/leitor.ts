@@ -135,10 +135,16 @@ export class Leitor extends EntidadeCombate {
     vida?: number,
     sabedoria?: number,
     titulo?: string,
-    totalXpGanho?: number
+    totalXpGanho?: number,
+    multiplicadorXP?: number,
+    inventario?: ItemLoja[],
+    vidaMaxima?: number
   ): void {
     this.exp = exp;
     this.totalXpGanho = typeof totalXpGanho === "number" ? totalXpGanho : Math.max(exp, this.totalXpGanho);
+    if (typeof vidaMaxima === "number") {
+      this.vidaMaxima = vidaMaxima;
+    }
     if (typeof vida === "number") {
       this.vida = Math.min(this.vidaMaxima, Math.max(0, vida));
     }
@@ -147,6 +153,12 @@ export class Leitor extends EntidadeCombate {
     }
     if (titulo) {
       this.tituloAtivo = titulo;
+    }
+    if (typeof multiplicadorXP === "number") {
+      this.multiplicadorXP = multiplicadorXP;
+    }
+    if (Array.isArray(inventario)) {
+      this.inventario = [...inventario];
     }
   }
 }

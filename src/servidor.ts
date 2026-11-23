@@ -10,12 +10,14 @@ import { InimigoLivro, LivroChefe } from "./models/livroModel.ts";
 import { Batalha } from "./models/batalha.ts";
 import { Jogo } from "./models/jogo.ts";
 import { ItemLoja } from "./models/interfaces.ts";
+import { PrismaJogoRepository } from "./models/prismaRepository.ts";
 
 import { GoogleBooksService } from "./googleBooks.ts";
 
 const PORT = 3000;
 const googleBooksService = new GoogleBooksService();
 const batalhaService = new Batalha();
+const repository = new PrismaJogoRepository();
 
 // Catálogo da Loja de Itens e Recompensas
 const ITENS_LOJA: ItemLoja[] = [
@@ -94,6 +96,23 @@ const ITENS_LOJA: ItemLoja[] = [
 let leitorAtual: Leitor | null = null;
 let jogoAtual: Jogo | null = null;
 
+async function inicializarEstado(): Promise<void> {
+  try {
+    const ultimoLeitor = await repository.carregarUltimoLeitor();
+    if (ultimoLeitor) {
+      leitorAtual = ultimoLeitor;
+      jogoAtual = new Jogo(leitorAtual);
+      const livros = await repository.listarLivrosDoLeitor(leitorAtual.id);
+      for (const livro of livros) {
+        jogoAtual.adicionarLivro(livro);
+      }
+      console.log(`[Banco de Dados] Estado restaurado para o herói: ${leitorAtual.nome} (${livros.length} livros)`);
+    }
+  } catch (err) {
+    console.error("[Banco de Dados] Erro ao carregar estado inicial:", err);
+  }
+}
+
 // Classes de erro para controle de respostas HTTP
 export class NaoEncontradoError extends Error {}
 export class RegraNegocioError extends Error {}
@@ -147,15 +166,50 @@ async function rotear(
       ];
     }
 
-    // POST /api/usuario -> Cria ou redefine o nome do jogador (Primeiro Acesso)
+    // POST /api/usuario -> Cria ou carrega o jogador pelo nome
     if (metodo === "POST" && !id) {
       const nome = String(body?.nome ?? "").trim();
       if (!nome) {
         throw new RegraNegocioError("O campo 'nome' é obrigatório.");
       }
 
+      // Consulta se o leitor já existe no banco de dados para não sobrescrever nem zerar a estante
+      const leitorExistente = await repository.carregarLeitorPorNome(nome);
+      if (leitorExistente) {
+        leitorAtual = leitorExistente;
+        jogoAtual = new Jogo(leitorAtual);
+        const livros = await repository.listarLivrosDoLeitor(leitorAtual.id);
+        for (const l of livros) {
+          jogoAtual.adicionarLivro(l);
+        }
+
+        return [
+          200,
+          {
+            mensagem: `Bem-vindo de volta, nobre ${leitorAtual.nome}! Seu progresso foi carregado.`,
+            leitor: {
+              id: leitorAtual.id,
+              nome: leitorAtual.nome,
+              vida: leitorAtual.getVida(),
+              vidaMaxima: leitorAtual.getVidaMaxima(),
+              nivel: leitorAtual.getNivel(),
+              experiencia: leitorAtual.getExperiencia(),
+              totalXpGanho: leitorAtual.getTotalXpGanho(),
+              sabedoria: leitorAtual.getSabedoria(),
+              multiplicadorXP: leitorAtual.getMultiplicadorXP(),
+              titulo: leitorAtual.getTitulo(),
+              danoPorPagina: leitorAtual.getDanoPorPagina(),
+              inventario: leitorAtual.getInventario(),
+              estaVivo: leitorAtual.estaVivo(),
+              precisaCadastro: false,
+            },
+          },
+        ];
+      }
+
       leitorAtual = new Leitor(String(Date.now()), nome);
       jogoAtual = new Jogo(leitorAtual);
+      await repository.salvarLeitor(leitorAtual);
 
       return [
         201,
@@ -277,6 +331,7 @@ async function rotear(
       }
 
       jogoAtual.adicionarLivro(novoLivro);
+      await repository.salvarLivro(novoLivro, leitorAtual.id);
 
       return [
         201,
@@ -324,6 +379,10 @@ async function rotear(
 
       const resultado = batalhaService.processarTurnoLeitura(leitorAtual, livro, paginas);
 
+      // Persiste o progresso do livro e do leitor (XP, vida, sabedoria)
+      await repository.salvarLivro(livro, leitorAtual.id);
+      await repository.salvarLeitor(leitorAtual);
+
       return [200, resultado];
     }
 
@@ -331,6 +390,8 @@ async function rotear(
     if (metodo === "DELETE" && id) {
       const removido = jogoAtual.removerLivro(id);
       if (!removido) throw new NaoEncontradoError(`Livro com ID ${id} não encontrado.`);
+
+      await repository.removerLivro(id);
 
       return [200, { mensagem: `Livro ${id} removido da estante.` }];
     }
@@ -367,6 +428,7 @@ async function rotear(
       }
 
       leitorAtual.comprarItem(item);
+      await repository.salvarLeitor(leitorAtual);
 
       return [
         200,
@@ -442,7 +504,8 @@ const servidor = createServer(async (req: IncomingMessage, res: ServerResponse) 
   });
 });
 
-servidor.listen(PORT, () => {
+servidor.listen(PORT, async () => {
+  await inicializarEstado();
   console.log(`
 ======================================================
   ⚔️  READINGPG (RPG LITERÁRIO) - BACKEND REST INICIADO

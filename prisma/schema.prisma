@@ -8,29 +8,35 @@ generator client {
 }
 
 model Leitor {
-  id          String   @id @default(uuid())
-  nome        String
-  vida        Int      @default(100)
-  vidaMaxima  Int      @default(100)
-  experiencia Int      @default(0)
-  criadoEm    DateTime @default(now())
+  id              String   @id @default(uuid())
+  nome            String
+  vida            Int      @default(100)
+  vidaMaxima      Int      @default(100)
+  experiencia     Int      @default(0)
+  totalXpGanho    Int      @default(0)
+  sabedoria       Int      @default(0)
+  multiplicadorXP Float    @default(1.0)
+  tituloAtivo     String   @default("Leitor Novato")
+  inventarioJson  String   @default("[]")
+  criadoEm        DateTime @default(now())
 
-  estante     Livro[]
+  estante         Livro[]
 }
 
 model Livro {
-  id           String   @id @default(uuid())
-  googleId     String?
-  titulo       String
-  autor        String
-  totalPaginas Int
-  hpAtual      Int
-  paginasLidas Int      @default(0)
-  status       String   @default("QUERO_LER") // QUERO_LER, LENDO, LIDO, ABANDONADO
-  isBoss       Boolean  @default(false)
-  genero       String?
-  capaUrl      String?
+  id              String   @id @default(uuid())
+  googleId        String?
+  titulo          String
+  autor           String
+  totalPaginas    Int
+  hpAtual         Int
+  paginasLidas    Int      @default(0)
+  status          String   @default("QUERO_LER") // QUERO_LER, LENDO, LIDO, ABANDONADO
+  isBoss          Boolean  @default(false)
+  genero          String?
+  multiplicadorXP Float    @default(1.5)
+  capaUrl         String?
 
-  leitorId     String
-  leitor       Leitor   @relation(fields: [leitorId], references: [id], onDelete: Cascade)
+  leitorId        String
+  leitor          Leitor   @relation(fields: [leitorId], references: [id], onDelete: Cascade)
 }

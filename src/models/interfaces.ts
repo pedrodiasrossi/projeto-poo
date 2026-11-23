@@ -20,9 +20,11 @@ export interface LeitorData {
   vida: number;
   vidaMaxima: number;
   exp: number;
-  totalXpGanho?: number;
-  sabedoria?: number;
-  titulo?: string;
+  totalXpGanho: number;
+  sabedoria: number;
+  multiplicadorXP: number;
+  tituloAtivo: string;
+  inventario?: ItemLoja[];
 }
 export type leitorData = LeitorData;
 
@@ -31,11 +33,15 @@ export interface LivroData {
   titulo: string;
   autor: string;
   totalPaginas: number;
-  progresso: number;
   hpAtual: number;
+  paginasLidas: number;
   status: StatusLeitura;
   isBoss: boolean;
   leitorId: string;
+  genero?: string;
+  multiplicadorXP?: number;
+  capaUrl?: string;
+  googleBooksId?: string;
 }
 export type livroData = LivroData;
 
