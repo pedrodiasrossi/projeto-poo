@@ -681,6 +681,11 @@ button:disabled {
   flex: 1;
 }
 
+.select-target-btn:disabled {
+  opacity: 60%;
+  cursor: default;
+}
+
 .delete-book-btn {
   background: transparent;
   border: 1px solid #3c242a;

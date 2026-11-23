@@ -691,6 +691,11 @@ export default function App() {
                 {livros.map((livro) => {
                   const percent = Math.max(0, Math.min(100, (livro.hpAtual / livro.hpMaximo) * 100));
                   const isActive = livro.id === activeBookId;
+                  const rotuloBotao =livro.status === "LIDO" || livro.status === "ABANDONADO"
+                    ? livro.status.charAt(0) + livro.status.toLowerCase().slice(1)
+                    : isActive
+                      ? "Em leitura"
+                      : "Selecionar";
 
                   return (
                     <div key={livro.id} className={`book-card ${isActive ? "is-active" : ""}`}>
@@ -715,12 +720,13 @@ export default function App() {
                         <div className="book-card-actions">
                           <button
                             className="select-target-btn"
+                            disabled={livro.status === "LIDO" || livro.status === "ABANDONADO"}
                             onClick={() => {
+                              if (livro.status === "LIDO" || livro.status === "ABANDONADO") return;
                               setActiveBookId(livro.id);
                               setTab("arena");
                             }}
-                          >
-                            {isActive ? "Em leitura" : "Selecionar"}
+                          >{rotuloBotao}
                           </button>
                           <button
                             className="delete-book-btn"
