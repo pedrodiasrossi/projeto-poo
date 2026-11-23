@@ -21,15 +21,9 @@ export class Batalha {
     if (finalizado) {
       xpGanho += 100;
       // Ao derrotar/concluir um livro, o leitor ganha Sabedoria! Livro Chefe concede o dobro.
-      sabedoriaGanha = livro instanceof LivroChefe ? 2 : 1;
+      sabedoriaGanha = livro.getSabedoriaRecompensa();
       leitor.ganharSabedoria(sabedoriaGanha);
     }
-
-    if (livro instanceof LivroChefe) {
-      xpGanho = livro.calcularBonusXP(xpGanho);
-    }
-
-    leitor.ganharExperiencia(xpGanho);
 
     return {
       danoCausado,
