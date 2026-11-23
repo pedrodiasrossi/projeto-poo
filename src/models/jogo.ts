@@ -7,6 +7,9 @@ export class Jogo {
   constructor(public readonly leitor: Leitor) {}
 
   public adicionarLivro(livro: InimigoLivro): void {
+    if (this.estante.has(livro.id)) {
+      throw new Error(`Livro com ID "${livro.id}" já existe na estante.`);
+    }
     this.estante.set(livro.id, livro);
   }
 

@@ -202,7 +202,7 @@ async function rotear(
   // --------------------------------------------------------------------------
   if (recurso === "estante") {
     if (!jogoAtual || !leitorAtual) {
-      return [200, { leitor: null, estante: [] }];
+      throw new RegraNegocioError("Nenhum herói encontrado. Cadastre um herói primeiro.");
     }
 
     // GET /api/estante -> Lista todos os livros na estante do jogador
@@ -238,11 +238,20 @@ async function rotear(
     if (metodo === "POST" && !id) {
       const { id: livroId, titulo, autor, totalPaginas, capaUrl, isBoss, genero } = body ?? {};
 
-      if (!titulo || !totalPaginas) {
+      if (!titulo || totalPaginas === undefined || totalPaginas === null) {
         throw new RegraNegocioError("Os campos 'titulo' e 'totalPaginas' são obrigatórios.");
       }
 
+      const paginasNum = Number(totalPaginas);
+      if (!Number.isInteger(paginasNum) || paginasNum <= 0) {
+        throw new RegraNegocioError("O campo 'totalPaginas' deve ser um número inteiro positivo maior que zero.");
+      }
+
       const novoId = livroId ? String(livroId) : String(Date.now());
+      if (jogoAtual.buscarLivro(novoId)) {
+        throw new RegraNegocioError(`Livro com ID '${novoId}' já existe na estante.`);
+      }
+
       let novoLivro: InimigoLivro;
 
       if (isBoss) {
@@ -250,7 +259,7 @@ async function rotear(
           novoId,
           String(titulo),
           String(autor || "Autor desconhecido"),
-          Number(totalPaginas),
+          paginasNum,
           String(genero || "Clássico"),
           1.5,
           livroId,
@@ -261,7 +270,7 @@ async function rotear(
           novoId,
           String(titulo),
           String(autor || "Autor desconhecido"),
-          Number(totalPaginas),
+          paginasNum,
           livroId,
           capaUrl
         );
@@ -306,8 +315,8 @@ async function rotear(
     // POST /api/estante/:id/ler -> Registra leitura e aplica dano ao livro
     if (metodo === "POST" && id && acao === "ler") {
       const paginas = Number(body?.paginas);
-      if (!paginas || paginas <= 0) {
-        throw new RegraNegocioError("O campo 'paginas' deve ser um número maior que zero.");
+      if (!Number.isInteger(paginas) || paginas <= 0) {
+        throw new RegraNegocioError("O campo 'paginas' deve ser um número inteiro positivo maior que zero.");
       }
 
       const livro = jogoAtual.buscarLivro(id);

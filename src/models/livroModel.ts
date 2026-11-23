@@ -13,6 +13,9 @@ export class InimigoLivro extends EntidadeCombate {
     public readonly googleBooksId?: string,
     public readonly capaUrl?: string
   ) {
+    if (!Number.isInteger(totalPaginas) || totalPaginas <= 0) {
+      throw new Error("O total de páginas deve ser um número inteiro positivo maior que zero.");
+    }
     super(titulo, totalPaginas, totalPaginas);
   }
 
@@ -29,8 +32,7 @@ export class InimigoLivro extends EntidadeCombate {
       throw new Error("Número inválido de páginas");
     }
 
-    // O dano real não pode ultrapassar a vida (páginas restantes) do livro
-    const danoReal = Math.min(paginas, this.vida);
+    const danoReal = paginas;
 
     // Incrementa o histórico de páginas lidas
     this.paginasLidas += danoReal;
@@ -92,11 +94,11 @@ export class LivroChefe extends InimigoLivro {
     super(id, titulo, autor, totalPaginas, googleBooksId, capaUrl);
   }
 
-  public calcularXP(xpBase: number): number {
+  public override calcularXP(xpBase: number): number {
     return Math.round(xpBase * this.multiplicadorXP);
   }
 
-  public getSabedoriaRecompensa(): number{
+  public override getSabedoriaRecompensa(): number {
     return 2;
   }
 }

@@ -80,6 +80,7 @@ export class Leitor extends EntidadeCombate {
     const custoSab = item.custoSabedoria ?? 0;
     const custoXP = item.custoXP ?? 0;
 
+    // 1. Verificações de saldo
     if (custoXP > 0 && this.exp < custoXP) {
       throw new Error(`XP insuficiente! Você possui ${this.exp} XP e o item custa ${custoXP} XP.`);
     }
@@ -90,10 +91,32 @@ export class Leitor extends EntidadeCombate {
       );
     }
 
+    // 2. Regras de negócio por tipo de item antes de debitar
+    if (item.tipo === "CURA") {
+      if (this.vida >= this.vidaMaxima) {
+        throw new Error("Sua energia/vida já está no máximo! Não é necessário se curar agora.");
+      }
+    } else if (item.tipo === "TITULO") {
+      const nomeTitulo = String(item.valor);
+      const jaPossui =
+        this.tituloAtivo === nomeTitulo ||
+        this.inventario.some((i) => i.tipo === "TITULO" && String(i.valor) === nomeTitulo);
+      if (jaPossui) {
+        throw new Error(`Você já possui o título "${nomeTitulo}" desbloqueado!`);
+      }
+    } else if (item.tipo === "BONUS_XP") {
+      const jaPossuiEquipamento = this.inventario.some((i) => i.id === item.id);
+      if (jaPossuiEquipamento) {
+        throw new Error(`Você já possui o equipamento "${item.nome}" equipado!`);
+      }
+    }
+
+    // Debita recursos
     this.exp -= custoXP;
     this.sabedoria -= custoSab;
     this.inventario.push(item);
 
+    // Aplica efeito
     if (item.tipo === "CURA") {
       this.curar(Number(item.valor));
     } else if (item.tipo === "MAX_VIDA") {

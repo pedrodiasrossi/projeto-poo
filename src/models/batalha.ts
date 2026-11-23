@@ -1,5 +1,5 @@
 import { Leitor } from "./leitor.ts";
-import { InimigoLivro, LivroChefe } from "./livroModel.ts";
+import { InimigoLivro } from "./livroModel.ts";
 import { ResultadoAtaqueLeitura } from "./interfaces.ts";
 
 export class Batalha {
@@ -20,10 +20,14 @@ export class Batalha {
 
     if (finalizado) {
       xpGanho += 100;
-      // Ao derrotar/concluir um livro, o leitor ganha Sabedoria! Livro Chefe concede o dobro.
+      // Ao derrotar/concluir um livro, o leitor ganha Sabedoria! Livro Chefe concede o dobro via polimorfismo.
       sabedoriaGanha = livro.getSabedoriaRecompensa();
       leitor.ganharSabedoria(sabedoriaGanha);
     }
+
+    // Aplica o cálculo polimórfico de XP do próprio InimigoLivro (LivroChefe aplica seu multiplicador)
+    xpGanho = livro.calcularXP(xpGanho);
+    leitor.ganharExperiencia(xpGanho);
 
     return {
       danoCausado,
