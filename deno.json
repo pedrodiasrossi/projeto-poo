@@ -4,8 +4,8 @@
   "exports": "./src/servidor.ts",
   "nodeModulesDir": "auto",
   "tasks": {
-    "dev": "deno run -A --watch src/servidor.ts",
-    "start": "deno run -A src/servidor.ts",
+    "dev": "deno run -A --env --watch src/servidor.ts",
+    "start": "deno run -A --env src/servidor.ts",
     "prisma:push": "deno run -A npm:prisma@5.22.0 db push",
     "prisma:generate": "deno run -A npm:prisma@5.22.0 generate",
     "prisma:studio": "deno run -A npm:prisma@5.22.0 studio"

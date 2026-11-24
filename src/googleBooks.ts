@@ -107,9 +107,11 @@ export class GoogleBooksService {
 
     // 1. TENTATIVA GOOGLE BOOKS
     try {
+      const apiKey = Deno.env.get("GOOGLE_BOOKS_API_KEY")?.trim();
+      const keyParam = apiKey ? `&key=${encodeURIComponent(apiKey)}` : "";
       const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(
         termo
-      )}&maxResults=${limite}`;
+      )}&maxResults=${limite}${keyParam}`;
       const resposta = await fetch(url, { headers: { "User-Agent": "ReadingPG/1.0" } });
 
       if (resposta.ok) {
@@ -117,14 +119,18 @@ export class GoogleBooksService {
         if (dados.items && Array.isArray(dados.items)) {
           return dados.items.map((item: any) => {
             const info = item.volumeInfo || {};
+            const paginas =
+              typeof info.pageCount === "number" && info.pageCount > 0
+                ? info.pageCount
+                : typeof info.printedPageCount === "number" && info.printedPageCount > 0
+                ? info.printedPageCount
+                : 150;
+
             return {
               id: item.id,
               titulo: info.title || "Sem título informado",
               autores: info.authors || ["Autor desconhecido"],
-              totalPaginas:
-                typeof info.pageCount === "number" && info.pageCount > 0
-                  ? info.pageCount
-                  : 150,
+              totalPaginas: paginas,
               descricao: info.description,
               capaUrl:
                 info.imageLinks?.thumbnail?.replace("http://", "https://") ||

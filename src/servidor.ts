@@ -1,6 +1,13 @@
 import { createServer, IncomingMessage, ServerResponse } from "node:http";
 import { Buffer } from "node:buffer";
 import { URL } from "node:url";
+import { loadSync } from "https://deno.land/std@0.224.0/dotenv/mod.ts";
+
+try {
+    loadSync({ export: true });
+} catch {
+    // Se não houver .env, continua com variáveis do ambiente
+}
 
 import { Leitor } from "./models/leitor.ts";
 import { InimigoLivro, LivroChefe, FabricaLivros } from "./models/livroModel.ts";
