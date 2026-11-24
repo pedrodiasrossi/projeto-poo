@@ -22,6 +22,7 @@ import {
     Moon
 } from "lucide-react";
 import { api } from "./api.js";
+import { LIVROS_CATALOGO_OFFLINE } from "../../src/googleBooks.ts";
 
 const PATAMAR_PAGINAS_BOSS = 350;
 
@@ -519,7 +520,7 @@ export default function App() {
                                           <span className="stat-detail">
                                               {leitor && leitor.vida <= 0 ? "⚠️ Exausto!" : "HP do jogador"}
                                           </span>
-                                          {leitor && leitor.vida < leitor.vidaMaxima && (
+                                          {leitor && leitor.vida == 0 && (
                                               <button
                                                   onClick={handleDescansar}
                                                   disabled={busy}
@@ -743,6 +744,16 @@ export default function App() {
                                                   <h3>Invocar Novo Livro como Monstro</h3>
                                               </div>
                                               <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                                                  <button
+                                                      type="button"
+                                                      class="offline-catalogue-btn"
+                                                      onClick={() => {
+                                                          setSearchTerm("");
+                                                          setSearchResults(LIVROS_CATALOGO_OFFLINE);
+                                                      }}
+                                                  >
+                                                      Catálogo Offline
+                                                  </button>
                                                   <select
                                                       value={generoNewBook}
                                                       onChange={(e) => setGeneroNewBook(e.target.value)}
@@ -802,7 +813,7 @@ export default function App() {
                                                                           placeItems: "center"
                                                                       }}
                                                                   >
-                                                                      <BookOpen size={20} color="#7483a5" />
+                                                                      <BookOpen size={20} color="#9da574" />
                                                                   </div>
                                                               )}
                                                               <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>

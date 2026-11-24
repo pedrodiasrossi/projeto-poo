@@ -16,7 +16,7 @@ export interface LivroGoogleDTO {
   capaUrl?: string;
 }
 
-const LIVROS_CATALOGO_OFFLINE: LivroGoogleDTO[] = [
+export const LIVROS_CATALOGO_OFFLINE: LivroGoogleDTO[] = [
   {
     id: "hobbit-tolkien",
     titulo: "O Hobbit",
