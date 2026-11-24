@@ -686,6 +686,16 @@ button:disabled {
   cursor: default;
 }
 
+.offline-catalogue-btn {
+  background: #0c1222;
+  border: 1px solid #58448b;
+  color: #d8cbf9;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
 .delete-book-btn {
   background: transparent;
   border: 1px solid #3c242a;
